@@ -50,16 +50,35 @@ def run_prompt(test_case):
 
     return output
 
+def grade_response(task, output):
+    """Grade Claude's response using Claude as grader (1-10 scale)."""
+    grader_prompt = f"""Task: {task}
+
+Response: {output[:500]}
+
+Rate this response 1-10 based on:
+- Correctness: Does it solve the task correctly?
+- Completeness: Is it a complete solution?
+- Quality: Is the code/config/regex well-written?
+
+Respond with ONLY a number 1-10."""
+
+    messages = []
+    add_user_message(messages, grader_prompt)
+
+    response = chat(messages)
+    score_text = extract_text(response).strip()
+
+    # Extract first digit found
+    for char in score_text:
+        if char.isdigit():
+            return int(char)
+    return 5  # Default if parsing fails
+
 def run_test_case(test_case):
-    """Execute one test case and collect results.
-
-    Calls run_prompt() and assigns a placeholder score (always 10).
-    TODO: Replace score placeholder with actual grading in next step.
-    """
+    """Execute one test case and collect results with real grading."""
     output = run_prompt(test_case)
-
-    # TODO - grading reale nel prossimo step
-    score = 10
+    score = grade_response(test_case['task'], output)
 
     return {
         "output": output,
@@ -117,13 +136,14 @@ def main():
         print(f"\n[Test {i}]")
         print(f"Task: {result['test_case']['task']}")
         print(f"Output: {result['output'][:150]}{'...' if len(result['output']) > 150 else ''}")
-        print(f"Score: {result['score']}/10 (placeholder)")
+        print(f"Score: {result['score']}/10")
 
     # Summary
+    avg_score = sum(r['score'] for r in results) / len(results)
     print("\n" + "="*80)
     print(f"📈 Summary: {len(results)} tests executed")
-    print("⚠️  Note: Scores are placeholder (always 10)")
-    print("💡 Next step: Implement real grading function")
+    print(f"📊 Average Score: {avg_score:.1f}/10")
+    print(f"✅ Real grading implemented (Claude as grader)")
     print("="*80)
 
 if __name__ == "__main__":

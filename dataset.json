@@ -1,0 +1,17 @@
+[
+  {
+    "task": "Write a Python Lambda function that extracts the bucket name and object key from an S3 event and returns them as a dictionary"
+  },
+  {
+    "task": "Create an EventBridge rule JSON config that triggers a Lambda function whenever an EC2 instance changes to 'running' state"
+  },
+  {
+    "task": "Write an IAM policy JSON snippet that grants read-only access to a specific S3 bucket prefix 'logs/2024/*'"
+  },
+  {
+    "task": "Write a Python function that validates AWS CloudWatch log group names using regex and returns True/False"
+  },
+  {
+    "task": "Create a regex pattern that matches valid AWS IAM role ARNs in the format arn:aws:iam::ACCOUNT:role/ROLE_NAME"
+  }
+]
