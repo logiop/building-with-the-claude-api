@@ -1,0 +1,91 @@
+{
+  "dataset_size": 5,
+  "average_syntax_score": 0,
+  "average_model_score": 5,
+  "average_combined_score": 2.5,
+  "results": [
+    {
+      "task": "Write a Python Lambda function that validates incoming S3 bucket names against AWS naming rules (3-63 chars, lowercase, no underscores)",
+      "format": "python",
+      "output": "\nimport re\nimport json\n\ndef lambda_handler(event, context):\n    bucket_name = event.get('bucket_name', '')\n    \n    # AWS S3 bucket naming rules:\n    # - Between 3 and 63 characters long\n    # - Lower",
+      "syntax_score": 0,
+      "model_score": 3,
+      "score": 1.5,
+      "reasoning": "The solution demonstrates good understanding of AWS S3 naming rules and uses a sophisticated regex pattern. However, it has critical flaws: the code is truncated/incomplete (syntax error), and it fails to implement two important validations that are acknowledged in the comments (consecutive dots and IP address checks). The regex alone doesn't prevent '192.168.1.1' from being accepted. The incomplete error message makes this code unable to run.",
+      "strengths": [
+        "Comprehensive regex pattern that correctly validates character set, start/end requirements, and handles edge cases like single character names",
+        "Proper HTTP response structure with appropriate status codes and JSON formatting for Lambda/API Gateway integration"
+      ],
+      "weaknesses": [
+        "Missing validation for consecutive dots (..) and IP address format, which are explicitly mentioned in comments but not implemented",
+        "Incomplete code - the error message string is cut off mid-sentence, making the function syntactically invalid and non-functional"
+      ]
+    },
+    {
+      "task": "Create a JSON IAM policy snippet that allows a Lambda function read-only access to a specific DynamoDB table",
+      "format": "json",
+      "output": "\nimport json\n\npolicy = {\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Effect\": \"Allow\",\n            \"Action\": [\n                \"dynamodb:GetItem\",\n                \"dynamodb:",
+      "syntax_score": 0,
+      "model_score": 6,
+      "score": 3.0,
+      "reasoning": "The policy correctly implements basic read-only DynamoDB access with appropriate actions. However, it uses overly permissive ARN wildcards and omits potential read operations like DescribeTable and stream operations. The placeholder TABLE_NAME requires manual substitution. For production use, the resource ARN should specify the actual AWS account ID and region, and additional read-only actions should be considered based on application requirements.",
+      "strengths": [
+        "Correctly identifies all primary read-only DynamoDB actions (GetItem, Query, Scan, BatchGetItem)",
+        "Uses proper IAM policy structure with correct Version, Statement, Effect, Action, and Resource fields"
+      ],
+      "weaknesses": [
+        "Resource ARN uses wildcards for region and account ID (*:*) instead of specifying actual values, reducing security through overly broad permissions",
+        "Missing read-only actions for DynamoDB Streams (GetRecords, GetShardIterator) and DescribeTable which may be needed for complete read-only access; TABLE_NAME is a placeholder that must be replaced"
+      ]
+    },
+    {
+      "task": "Write a regex pattern to extract CloudWatch log group names from ARN strings (format: arn:aws:logs:region:account-id:log-group:name)",
+      "format": "regex",
+      "output": "\nimport re\n\ndef extract_cloudwatch_log_group(arn):\n    pattern = r'arn:aws:logs:[^:]+:\\d+:log-group:(.+?)(?::\\*)?$'\n    match = re.search(pattern, arn)\n    return match.group(1) if match else None\n\n# ",
+      "syntax_score": 0,
+      "model_score": 5,
+      "score": 2.5,
+      "reasoning": "JSON parse failed",
+      "strengths": [
+        "Unable to parse"
+      ],
+      "weaknesses": [
+        "Parsing error"
+      ]
+    },
+    {
+      "task": "Write a Python function that parses EventBridge rule JSON and returns all target Lambda ARNs",
+      "format": "python",
+      "output": "\nimport json\nimport re\n\ndef parse_eventbridge_targets(rule_json):\n    \"\"\"\n    Parses EventBridge rule JSON and returns all target Lambda ARNs.\n    \n    Args:\n        rule_json: JSON string or dict con",
+      "syntax_score": 0,
+      "model_score": 4,
+      "score": 2.0,
+      "reasoning": "The solution addresses the core requirement but has a significant logical flaw: it returns RoleArns alongside target Arns, when RoleArns are execution roles (IAM service roles) not Lambda function ARNs. EventBridge targets have an 'Arn' field pointing to the Lambda function and a separate 'RoleArn' for execution permissions - only the 'Arn' should be returned. Additionally, the substring matching approach is fragile and doesn't validate proper ARN structure (arn:aws:lambda:region:account:function:name).",
+      "strengths": [
+        "Handles both string and dict input types gracefully with proper type checking",
+        "Includes docstring with clear documentation of parameters and return values"
+      ],
+      "weaknesses": [
+        "Incorrectly includes RoleArn in results - RoleArns are IAM roles, not Lambda function ARNs, and should not be returned for this task",
+        "Uses weak string matching ('lambda' in arn.lower()) instead of validating actual ARN format - could match unintended strings and miss valid Lambda ARNs with different formats"
+      ]
+    },
+    {
+      "task": "Create a JSON EventBridge rule configuration that triggers a Lambda function every day at 2 AM UTC",
+      "format": "json",
+      "output": "\n{\n  \"Name\": \"DailyLambdaTrigger\",\n  \"Description\": \"EventBridge rule to trigger Lambda function every day at 2 AM UTC\",\n  \"EventBusName\": \"default\",\n  \"ScheduleExpression\": \"cron(0 2 * * ? *)\",\n  \"St",
+      "syntax_score": 0,
+      "model_score": 7,
+      "score": 3.5,
+      "reasoning": "The configuration correctly specifies the cron schedule and includes properly formatted ARNs for Lambda and IAM role. However, it lacks error handling mechanisms (DLQ and retry policies) that are important for production use. The hardcoded AWS account ID and region reduce reusability. DeadLetterConfig and explicit RetryPolicy are best practices for EventBridge rules.",
+      "strengths": [
+        "Cron expression is correctly formatted for 2 AM UTC daily scheduling (0 2 * * ? *)",
+        "Includes all essential required fields: Name, ScheduleExpression, State, and Targets with proper ARN format"
+      ],
+      "weaknesses": [
+        "Missing DeadLetterConfig for handling failed Lambda invocations, reducing reliability and observability",
+        "No RetryPolicy defined; Lambda failures will use default retry behavior instead of explicit configuration"
+      ]
+    }
+  ]
+}

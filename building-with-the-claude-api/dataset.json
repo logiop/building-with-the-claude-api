@@ -1,0 +1,22 @@
+[
+  {
+    "task": "Write a Python Lambda function that validates incoming S3 bucket names against AWS naming rules (3-63 chars, lowercase, no underscores)",
+    "format": "python"
+  },
+  {
+    "task": "Create a JSON IAM policy snippet that allows a Lambda function read-only access to a specific DynamoDB table",
+    "format": "json"
+  },
+  {
+    "task": "Write a regex pattern to extract CloudWatch log group names from ARN strings (format: arn:aws:logs:region:account-id:log-group:name)",
+    "format": "regex"
+  },
+  {
+    "task": "Write a Python function that parses EventBridge rule JSON and returns all target Lambda ARNs",
+    "format": "python"
+  },
+  {
+    "task": "Create a JSON EventBridge rule configuration that triggers a Lambda function every day at 2 AM UTC",
+    "format": "json"
+  }
+]
